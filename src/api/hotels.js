@@ -1,5 +1,7 @@
 import resource from "resource-router-middleware";
-import hotels from "../models/hotels";
+import hotels, * as fromHotels from "../models/hotels";
+import { FilterQuery } from "../data/schemas";
+import Joi from "joi";
 
 export default ({ config, db }) =>
 	resource({
@@ -16,8 +18,11 @@ export default ({ config, db }) =>
 		},
 
 		/** GET / - List all entities */
-		index({ params }, res) {
-			res.json(hotels);
+		index({ query }, res) {
+			Joi.validate(query, FilterQuery, (err, { ratings }) => {
+				console.log({ ratings });
+				res.json(fromHotels.withRatings(ratings));
+			});
 		},
 
 		/** POST / - Create a new entity */
